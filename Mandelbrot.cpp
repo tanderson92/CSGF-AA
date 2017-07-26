@@ -7,7 +7,7 @@
 #include <limits> 
 
 int main(int argc, char **argv) {
-  // Initialize MPI before Kokkos
+/*  // Initialize MPI before Kokkos
   MPI_Init(&argc, &argv);
 
   // Initialize Kokkos
@@ -48,6 +48,15 @@ int main(int argc, char **argv) {
   Kokkos::finalize();
 
   MPI_Finalize();
+*/
+
+  int pixelcountx = 8192;
+  float centerx = -0.75;
+  float centery =  0.00;
+  float lengthx = 2.75;
+  float lengthy = 2.00;
+  float pixelsize = lengthx/pixelcountx;
+  int pixelcounty = trunc(lengthy/pixelsize);
 
   return 0;
 }
