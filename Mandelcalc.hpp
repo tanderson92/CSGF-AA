@@ -4,8 +4,8 @@
 KOKKOS_INLINE_FUNCTION int MandelCalcBW(float x, float y);
 KOKKOS_INLINE_FUNCTION int MandelCalcDist(float x, float y, float pixelsize);
 KOKKOS_INLINE_FUNCTION int Color(float distance, float pixelsize);
-KOKKOS_INLINE_FUNCTION void MandelCalcHSV(float x, float y, float pixelsize, int* H, int* S, int* V);
-KOKKOS_INLINE_FUNCTION void HSV(float distance, float pixelsize, int* V);
+KOKKOS_INLINE_FUNCTION void MandelCalcHSV(float x, float y, float pixelsize, float* H, float* S, float* V);
+KOKKOS_INLINE_FUNCTION void HSV(float distance, float pixelsize, float* V);
 
 int MandelCalcBW(float x, float y){
   int iter = 0;
@@ -60,7 +60,7 @@ int Color(float distance, float pixelsize){
     return 255;
 }//end Color
 
-void MandelCalcHSV(float x, float y, float pixelsize, int* H, int* S, int* V){
+void MandelCalcHSV(float x, float y, float pixelsize, float* H, float* S, float* V){
   int iter = 0;
   int iter_max = 10000;
   float rad = 0, zx = 0, zy = 0, rad_max = 1 << 18,  distance = 0, dzx = 0, dzy = 0;
@@ -82,7 +82,7 @@ void MandelCalcHSV(float x, float y, float pixelsize, int* H, int* S, int* V){
   if(iter < iter_max){
     HSV(distance, pixelsize, V);
     *S = 0.7;
-    *H = log(iter)/log(iter_max)*10;
+    *H = log((float) iter)/log((float) iter_max)*10;
     *H = *H - floor(*H);
   }
   else{
@@ -93,7 +93,7 @@ void MandelCalcHSV(float x, float y, float pixelsize, int* H, int* S, int* V){
   }
 }//end MandelCalcHSV  
 
-void HSV(float distance, float pixelsize, int* V){
+void HSV(float distance, float pixelsize, float* V){
   if (distance < pixelsize/2.0)
    *V = pow(2.0*distance/pixelsize, 1/3.0);
   else
