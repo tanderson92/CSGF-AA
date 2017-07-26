@@ -2,10 +2,10 @@
 #define MANDELCALHEADERDEF
 
 #function definitions
-int MandelCalcBW(int x, int y);
+int MandelCalcBW(float x, float y);
+int MandelCalcColor(float x, float y);
 
-
-int MandelCalcBW(int x, int y){
+int MandelCalcBW(float x, float y){
   int iter = 0;
   int iter_max = 1000;
   float rad = 0, zx = 0, zy = 0, rad_max = 2.0;
@@ -21,7 +21,7 @@ int MandelCalcBW(int x, int y){
   val = 0;
   if iter < iter_max{
     //this pixel is in the mandelbrot set
-    val = 1;
+    val = 255;
   }
   return(val);
  
