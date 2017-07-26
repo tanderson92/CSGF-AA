@@ -51,8 +51,12 @@ int main(int argc, char **argv) {
 
   MPI_Finalize();
 */
+  MPI_Init(&argc, &argv);
 
-  int pixelcountx = 64;
+  // Initialize Kokkos
+  Kokkos::initialize(argc, argv);
+
+  int pixelcountx = 4096;
   float centerx = -0.75;
   float centery =  0.00;
   float lengthx = 2.75;
@@ -62,16 +66,19 @@ int main(int argc, char **argv) {
 
   float minx = centerx - lengthx/2.0;
   float maxy = centery + lengthy/2.0;
-  unsigned char *pixels = new unsigned char[pixelcounty*pixelcountx];
+  Kokkos::View<unsigned char**> pixels("pixels", pixelcountx, pixelcounty);
 
-  for (int pixely = 0; pixely < pixelcounty; pixely++) {
-    for (int pixelx = 0; pixelx < pixelcountx; pixelx++) {
-      float x = minx + pixelx*pixelsize;
-      float y = maxy - pixely*pixelsize;
-      int i = pixely * pixelcountx + pixelx;
-      pixels[i] = MandelCalcBW(x, y);
-    }
-  }
+  // Create host mirror of pixels
+  auto  pixels_mirror = Kokkos::create_mirror_view(pixels);
+
+  using range2d_t = Kokkos::Experimental::MDRangePolicy<Kokkos::Experimental::Rank<2>, Kokkos::IndexType<int>>;
+  range2d_t range( {0, 0}, {pixelcountx, pixelcounty} );
+  Kokkos::Experimental::md_parallel_for(range, KOKKOS_LAMBDA(int i, int j){
+      float x = minx + i*pixelsize;
+      float y = maxy - j*pixelsize;
+      pixels(i, j) = MandelCalcBW(x, y);
+  });
+  deep_copy(pixels_mirror, pixels);
 
   std::ofstream image;
   image.open("mandelbrot.pgm");
@@ -79,10 +86,15 @@ int main(int argc, char **argv) {
     image << "P5" << std::endl;
     image << pixelcountx << " " << pixelcounty << std::endl;
     image << 255 << std::endl;
-    for (int i = 0; i < pixelcountx*pixelcounty; i++) {
-      image << pixels[i];
+    for (int j = 0; j < pixelcounty; j++) {
+      for (int i = 0; i < pixelcountx; i++) {
+        image << pixels_mirror(i, j);
+      }
     }
     image.close();
   }
+  Kokkos::finalize();
+
+  MPI_Finalize();
   return 0;
 }

@@ -1,8 +1,7 @@
 #ifndef MANDELCALCHEADERDEF
 #define MANDELCALHEADERDEF
 
-int MandelCalcBW(float x, float y);
-int MandelCalcColor(float x, float y);
+KOKKOS_INLINE_FUNCTION int MandelCalcBW(float x, float y);
 
 int MandelCalcBW(float x, float y){
   int iter = 0;
