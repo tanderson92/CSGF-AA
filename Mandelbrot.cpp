@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
   // Initialize Kokkos
   Kokkos::initialize(argc, argv);
 
-  int pixelcountx = 128;
+  int pixelcountx = 8192;
   float centerx = -0.75;
   float centery =  0.00;
   float lengthx = 2.75;
@@ -36,11 +36,12 @@ int main(int argc, char **argv) {
   Kokkos::Experimental::md_parallel_for(range, KOKKOS_LAMBDA(int i, int j){
       float x = minx + i*pixelsize;
       float y = maxy - j*pixelsize;
-      pixels(i, j) = MandelCalcBW(x, y);
+      //pixels(i, j) = MandelCalcBW(x, y);
+      pixels(i, j) = MandelCalcDist(x, y, pixelsize);
   });
-  double elapsed_seconds = timer.seconds();
-  std::cout << "parallel for time: " <<elapsed_seconds <<" seconds";
   deep_copy(pixels_mirror, pixels);
+  double elapsed_seconds = timer.seconds();
+  std::cout << "parallel_for time: " << elapsed_seconds <<" seconds\n";
 
   std::ofstream image("mandelbrot.pgm", std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
   if (image.is_open()) {
