@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
   MPI_Finalize();
 */
 
-  int pixelcountx = 8192;
+  int pixelcountx = 64;
   float centerx = -0.75;
   float centery =  0.00;
   float lengthx = 2.75;
@@ -79,6 +79,9 @@ int main(int argc, char **argv) {
     image << "P5" << std::endl;
     image << pixelcountx << " " << pixelcounty << std::endl;
     image << 255 << std::endl;
+    for (int i = 0; i < pixelcountx*pixelcounty; i++) {
+      image << pixels[i];
+    }
     image.close();
   }
   return 0;
