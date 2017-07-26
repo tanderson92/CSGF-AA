@@ -1,10 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <Kokkos_Core.hpp>
 #include <Kokkos_Parallel.hpp>
 #include <Kokkos_View.hpp>
 #include "mpi.h"
 #include <assert.h>
 #include <limits> 
+#include "Mandelcalc.hpp"
 
 int main(int argc, char **argv) {
 /*  // Initialize MPI before Kokkos
@@ -58,5 +60,26 @@ int main(int argc, char **argv) {
   float pixelsize = lengthx/pixelcountx;
   int pixelcounty = trunc(lengthy/pixelsize);
 
+  float minx = centerx - lengthx/2.0;
+  float maxy = centery + lengthy/2.0;
+  unsigned char *pixels = new unsigned char[pixelcounty*pixelcountx];
+
+  for (int pixely = 0; pixely < pixelcounty; pixely++) {
+    for (int pixelx = 0; pixelx < pixelcountx; pixelx++) {
+      float x = minx + pixelx*pixelsize;
+      float y = maxy - pixely*pixelsize;
+      int i = pixely * pixelcountx + pixelx;
+      pixels[i] = MandelCalcBW(x, y);
+    }
+  }
+
+  std::ofstream image;
+  image.open("mandelbrot.pgm");
+  if (image.is_open()) {
+    image << "P5" << std::endl;
+    image << pixelcountx << " " << pixelcounty << std::endl;
+    image << 255 << std::endl;
+    image.close();
+  }
   return 0;
 }
