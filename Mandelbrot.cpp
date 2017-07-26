@@ -32,14 +32,14 @@ int main(int argc, char **argv) {
   using range2d_t = Kokkos::Experimental::MDRangePolicy<Kokkos::Experimental::Rank<2>, Kokkos::IndexType<int>>;
   range2d_t range( {0, 0}, {pixelcountx, pixelcounty} );
   
-  Kokkos::Timer timer();
+  Kokkos::Timer timer;
   Kokkos::Experimental::md_parallel_for(range, KOKKOS_LAMBDA(int i, int j){
       float x = minx + i*pixelsize;
       float y = maxy - j*pixelsize;
       pixels(i, j) = MandelCalcBW(x, y);
   });
-  double elapsed_seconds = Timer.seconds();
-  cout << "parallel for time: " <<elapsed_seconds <<" seconds";
+  double elapsed_seconds = timer.seconds();
+  std::cout << "parallel for time: " <<elapsed_seconds <<" seconds";
   deep_copy(pixels_mirror, pixels);
 
   std::ofstream image("mandelbrot.pgm", std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
